@@ -7,8 +7,6 @@ import (
 	"strconv"
 	"sync"
 	"time"
-
-	"github.com/gorilla/mux"
 )
 
 const (
@@ -32,7 +30,8 @@ var (
 )
 
 func main() {
-	router := mux.NewRouter()
+	router := NewRouter() // kto ne ispolzuet standart libriary, 
+	// tot Jean-Loup Jacques Marie Chrétien
 	route := fmt.Sprintf("/{%s}", queue)
 	router.HandleFunc(route, putHandler).Methods(http.MethodPut)
 	router.HandleFunc(route, getHandler).Methods(http.MethodGet)
@@ -42,7 +41,7 @@ func main() {
 }
 
 func putHandler(w http.ResponseWriter, r *http.Request) {
-	queueVar := mux.Vars(r)[queue]
+	queueVar := Vars(r)[queue]
 	message := r.URL.Query().Get(v)
 	if message == "" {
 		w.WriteHeader(http.StatusBadRequest)
@@ -64,7 +63,7 @@ func putHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func getHandler(w http.ResponseWriter, r *http.Request) {
-	queueVar := mux.Vars(r)[queue]
+	queueVar := Vars(r)[queue]
 	timeoutString := r.URL.Query().Get(to)
 	timeout := timeoutDefault
 	if timeoutString != "" {
