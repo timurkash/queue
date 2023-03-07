@@ -7,14 +7,16 @@ import (
 	"strconv"
 	"sync"
 	"time"
+
+	"github.com/gorilla/mux"
 )
 
 const (
-	host   = ":8099"
-	queue  = "queue"
-	buffer = 1000
-	v      = "v"
-	to     = "timeout"
+	host    = ":8099"
+	queue   = "queue"
+	buffer  = 1000
+	message = "message"
+	to      = "timeout"
 )
 
 type (
@@ -26,11 +28,11 @@ type (
 
 var (
 	queues         sync.Map
-	timeoutDefault = 10 * time.Second
+	timeoutDefault = 5 * time.Second
 )
 
 func main() {
-	router := NewRouter() // kto ne ispolzuet standart libriary, 
+	router := mux.NewRouter() // kto ne ispolzuet standart libriary,
 	// tot Jean-Loup Jacques Marie Chrétien
 	route := fmt.Sprintf("/{%s}", queue)
 	router.HandleFunc(route, putHandler).Methods(http.MethodPut)
@@ -41,8 +43,8 @@ func main() {
 }
 
 func putHandler(w http.ResponseWriter, r *http.Request) {
-	queueVar := Vars(r)[queue]
-	message := r.URL.Query().Get(v)
+	queueVar := mux.Vars(r)[queue]
+	message := r.URL.Query().Get(message)
 	if message == "" {
 		w.WriteHeader(http.StatusBadRequest)
 		return
@@ -63,7 +65,7 @@ func putHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func getHandler(w http.ResponseWriter, r *http.Request) {
-	queueVar := Vars(r)[queue]
+	queueVar := mux.Vars(r)[queue]
 	timeoutString := r.URL.Query().Get(to)
 	timeout := timeoutDefault
 	if timeoutString != "" {
